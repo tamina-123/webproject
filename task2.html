@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personalized Movie Recommendations</title>
+    <style>
+        .movie-card {
+            border: 1px solid #ddd;
+            padding: 20px;
+            width: 250px;
+            margin: 10px;
+            display: inline-block;
+            vertical-align: top;
+        }
+
+        .recommendations {
+            padding: 20px;
+        }
+        .filter-buttons button{
+            padding: 10px;
+            margin: 5px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="filter-buttons">
+        <button onclick="filterRecommendations('all')">All</button>
+        <button onclick="filterRecommendations('popular')">Popular</button>
+        <button onclick="filterRecommendations('genre')">Genre</button>
+        <button onclick="filterRecommendations('watchlist')">Watchlist</button>
+    </div>
+
+    <div class="recommendations" id="recommendations">
+        </div>
+
+    <script>
+        // Mock data (replace with actual data or API calls)
+        const movies = [
+            { id: 1, title: 'Action Movie 1', genre: 'Action', rating: 3.8, popularity: 75, inWatchlist: true },
+            { id: 2, title: 'Comedy Movie 2', genre: 'Comedy', rating: 4.2, popularity: 82, inWatchlist: false },
+            { id: 3, title: 'Drama Movie 3', genre: 'Drama', rating: 4.2, popularity: 85, inWatchlist: true },
+            { id: 4, title: 'Action Movie 4', genre: 'Action', rating: 3.9, popularity: 80, inWatchlist: false },
+            { id: 5, title: 'Sci-Fi Movie 5', genre: 'Sci-Fi', rating: 4.7, popularity: 95, inWatchlist: true },
+            { id: 6, title: 'Comedy Movie 6', genre: 'Comedy', rating: 3.5, popularity: 70, inWatchlist: false },
+            { id: 7, title: 'Drama Movie 7', genre: 'Drama', rating: 3.6, popularity: 75, inWatchlist: true },
+            { id: 8, title: 'Sci-Fi Movie 8', genre: 'Sci-Fi', rating: 4.8, popularity: 92, inWatchlist: false },
+            { id: 9, title: 'Action Movie 9', genre: 'Action', rating: 4.3, popularity: 88, inWatchlist: true },
+            { id: 10, title: 'Comedy Movie 10', genre: 'Comedy', rating: 3.7, popularity: 78, inWatchlist: false },
+        ];
+
+        let filteredMovies = [...movies]; // Start with all movies
+
+        function calculateWeightedScore(movie) {
+            // Mock algorithm: weighted score based on rating, popularity, and watchlist
+            let score = movie.rating * 0.6 + movie.popularity * 0.3;
+            if (movie.inWatchlist) {
+                score += 5; // Add extra weight for watchlist items
+            }
+            return score;
+        }
+
+        function renderRecommendations(movieList) {
+            const recommendationsDiv = document.getElementById('recommendations');
+            recommendationsDiv.innerHTML = ''; // Clear existing recommendations
+
+            movieList.sort((a, b) => calculateWeightedScore(b) - calculateWeightedScore(a)); // Sort by weighted score
+
+            movieList.forEach(movie => {
+                const movieCard = document.createElement('div');
+                movieCard.classList.add('movie-card');
+                movieCard.innerHTML = `
+                    <h3>${movie.title}</h3>
+                    <p>Genre: ${movie.genre}</p>
+                    <p>Rating: ${movie.rating}</p>
+                    <p>Popularity: ${movie.popularity}</p>
+                    <p>Watchlist: ${movie.inWatchlist ? 'Yes' : 'No'}</p>
+                `;
+                recommendationsDiv.appendChild(movieCard);
+            });
+        }
+
+        function filterRecommendations(filterType) {
+            switch (filterType) {
+                case 'popular':
+                    filteredMovies = movies.filter(movie => movie.popularity > 80);
+                    break;
+                case 'genre':
+                    filteredMovies = movies.filter(movie => movie.genre === 'Action' || movie.genre === 'Sci-Fi'); //Example Genre filter
+                    break;
+                case 'watchlist':
+                    filteredMovies = movies.filter(movie => movie.inWatchlist);
+                    break;
+                default:
+                    filteredMovies = [...movies]; // All movies
+            }
+            renderRecommendations(filteredMovies);
+        }
+
+        // Initial rendering
+        renderRecommendations(filteredMovies);
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Movie Filtering</title>
+    <style>
+        .filter-chips {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 10px;
+        }
+
+        .filter-chip {
+            background-color: #f0f0f0;
+            border-radius: 20px;
+            padding: 8px 15px;
+            margin: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .filter-chip.active {
+            background-color: #007bff;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .movie-list {
+            padding: 20px;
+        }
+
+        .movie-card {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin: 10px;
+            display: inline-block;
+            width: 200px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="filter-chips" id="filterChips">
+        <div class="filter-chip" data-filter="genre-action">Action</div>
+        <div class="filter-chip" data-filter="genre-comedy">Comedy</div>
+        <div class="filter-chip" data-filter="rating-4">Rating 4+</div>
+        <div class="filter-chip" data-filter="year-2020">Year 2020+</div>
+    </div>
+
+    <div class="movie-list" id="movieList"></div>
+
+    <script>
+        const movies = [
+            { title: 'Action 1', genre: 'Action', rating: 4.2, year: 2022 },
+            { title: 'Comedy 1', genre: 'Comedy', rating: 3.8, year: 2018 },
+            { title: 'Action 2', genre: 'Action', rating: 3.9, year: 2022 },
+            { title: 'Comedy 2', genre: 'Comedy', rating: 4.1, year: 2020 },
+            { title: 'Drama 1', genre: 'Drama', rating: 4.7, year: 2023 },
+            { title: 'Action 3', genre: 'Action', rating: 4.1, year: 2021 },
+            { title: 'Comedy 3', genre: 'Comedy', rating: 3.6, year: 2019 },
+            { title: 'Drama 2', genre: 'Drama', rating: 4.4, year: 2022 },
+        ];
+
+        const filterChips = document.getElementById('filterChips');
+        const movieList = document.getElementById('movieList');
+        const activeFilters = new Set();
+
+        function renderMovies() {
+            movieList.innerHTML = '';
+            const filteredMovies = movies.filter(movie => {
+                let passesFilters = true;
+                activeFilters.forEach(filter => {
+                    const [type, value] = filter.split('-');
+                    if (type === 'genre' && movie.genre.toLowerCase() !== value) {
+                        passesFilters = false;
+                    } else if (type === 'rating' && movie.rating < parseInt(value)) {
+                        passesFilters = false;
+                    } else if (type === 'year' && movie.year < parseInt(value)) {
+                        passesFilters = false;
+                    }
+                });
+                return passesFilters;
+            });
+
+            filteredMovies.forEach(movie => {
+                const movieCard = document.createElement('div');
+                movieCard.classList.add('movie-card');
+                movieCard.innerHTML = `
+                    <h3>${movie.title}</h3>
+                    <p>Genre: ${movie.genre}</p>
+                    <p>Rating: ${movie.rating}</p>
+                    <p>Year: ${movie.year}</p>
+                `;
+                movieList.appendChild(movieCard);
+            });
+        }
+
+        filterChips.addEventListener('click', (event) => {
+            if (event.target.classList.contains('filter-chip')) {
+                const filter = event.target.dataset.filter;
+                if (activeFilters.has(filter)) {
+                    activeFilters.delete(filter);
+                    event.target.classList.remove('active');
+                } else {
+                    activeFilters.add(filter);
+                    event.target.classList.add('active');
+                }
+                renderMovies();
+            }
+        });
+
+        renderMovies(); // Initial rendering
+    </script>
+
+</body>
+</html>
